@@ -1,14 +1,12 @@
 import java.util.Scanner;
 
 public class Game {
-    char humanPlayer = 'X';
-    char computerPlayer = 'O';
-
-    boolean boxAvailable = false;
-    boolean boxEmpty = false;
-    byte winner = 0;
-    char[] box = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    int[][] winningCombinations = {
+    private static final char HUMAN_PLAYER = 'X';
+    private static final char COMPUTER_PLAYER = 'O';
+    private boolean boxEmpty = false;
+    private byte winner = 0;
+    private char[] box = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    private int[][] winningCombinations = {
             {0, 1, 2},
             {3, 4, 5},
             {6, 7, 8},
@@ -18,8 +16,15 @@ public class Game {
             {0, 4, 8},
             {2, 4, 6}
     };
+    public static char getHumanPlayer(){
+        return HUMAN_PLAYER;
+    }
+    public static char getComputerPlayer(){
+        return COMPUTER_PLAYER;
+    }
 
-    public static void welcomeMessage() {
+
+    public void welcomeMessage() {
         System.out.println("Enter box number to select. Enjoy!\n");
     }
 
@@ -31,7 +36,7 @@ public class Game {
         while (true) {
             byte input = scan.nextByte();
             if (input > 0 && input < 10) {
-                if (box[input - 1] == humanPlayer || box[input - 1] == computerPlayer)
+                if (box[input - 1] == HUMAN_PLAYER || box[input - 1] == COMPUTER_PLAYER)
                     System.out.println("That one is already in use. Enter another.");
                 else {
                     box[input - 1] = 'X';
@@ -82,9 +87,9 @@ public class Game {
             }
 
             if (isWinningCombination) {
-                if (player == humanPlayer) {
+                if (player == HUMAN_PLAYER) {
                     this.setWinner((byte) 1);
-                } else if (player == computerPlayer) {
+                } else if (player == COMPUTER_PLAYER) {
                     this.setWinner((byte) 2);
                 }
             }
@@ -92,10 +97,10 @@ public class Game {
     }
 
     public void checkForDraw() {
-        boxAvailable = false;
+        boolean boxAvailable = false;
 
         for (int i = 0; i < 9; i++) {
-            if (box[i] != humanPlayer && box[i] != computerPlayer) {
+            if (box[i] != HUMAN_PLAYER && box[i] != COMPUTER_PLAYER) {
                 boxAvailable = true;
                 break;
             }
@@ -108,10 +113,27 @@ public class Game {
     public void computersTurn() {
         while (true) {
             byte rand = (byte) (Math.random() * (9 - 1 + 1) + 1);
-            if (box[rand - 1] != humanPlayer && box[rand - 1] != computerPlayer) {
-                box[rand - 1] = computerPlayer;
+            if (box[rand - 1] != HUMAN_PLAYER && box[rand - 1] != COMPUTER_PLAYER) {
+                box[rand - 1] = COMPUTER_PLAYER;
                 break;
             }
+        }
+    }
+    public void runGame (){
+        Scanner scan = new Scanner(System.in);
+        this.welcomeMessage();
+        while (true) {
+            this.buildGameField();
+            if (this.isGameEnd()) break;
+            this.playersTurn(scan);
+            this.checkWinner(Game.getHumanPlayer());
+            this.checkForDraw();
+            if (this.isGameEnd()) break;
+            this.computersTurn();
+            this.buildGameField();
+            this.checkWinner(Game.getComputerPlayer());
+            this.checkForDraw();
+            if (this.isGameEnd()) break;
         }
     }
 
